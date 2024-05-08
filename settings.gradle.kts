@@ -1,3 +1,3 @@
-rootProject.name = "java-library-template"
+rootProject.name = "utils"
 
-include("java-library-template")
+include("utils")

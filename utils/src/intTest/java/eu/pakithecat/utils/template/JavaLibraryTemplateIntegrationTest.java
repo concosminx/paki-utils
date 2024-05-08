@@ -1,4 +1,4 @@
-package dev.thriving.oss.java.library.template;
+package eu.pakithecat.utils;
 
 import org.junit.jupiter.api.Test;
 

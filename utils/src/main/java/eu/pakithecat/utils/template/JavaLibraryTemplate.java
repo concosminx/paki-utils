@@ -1,4 +1,4 @@
-package dev.thriving.oss.java.library.template;
+package eu.pakithecat.utils;
 
 /**
  * Javadoc for {@link JavaLibraryTemplate}
