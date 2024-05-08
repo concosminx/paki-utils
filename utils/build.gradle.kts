@@ -8,9 +8,9 @@ object Meta {
     const val licenseUrl = "https://opensource.org/licenses/Apache-2.0"
     const val githubRepo = "concosminx/paki-utils"
     const val developerId = "concosminx"
-    const val developerName = "Your Name"
+    const val developerName = "Cosmin C."
     const val developerOrganization = "ACME Corporation"
-    const val developerOrganizationUrl = "https://yourdomain.com"
+    const val developerOrganizationUrl = "https://pakithecat.eu"
 }
 
 java {
