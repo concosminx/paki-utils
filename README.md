@@ -93,7 +93,7 @@ The Maven publish process is fully automated and does not require manual action.
 
 ### Prerequisites: Sonatype Credentials & GPG Signing Key
 The initial setup for your OSSRH repository requires some manual steps and human review (see why), after which your deployment process is typically modified to get components into OSSRH. These are all one time steps.
-I recommend to follow the [official guide](https://central.sonatype.org/publish/publish-guide/).
+I recommend to follow the [official guide](https://central.sonatype.org/publish/publish-guide/). Check also [this](https://central.sonatype.org/publish/generate-token/)
 
 In order to deploy your components to OSSRH with Gradle, you have to meet the [requirements](https://central.sonatype.org/publish/requirements/) for your metadata in the pom.xml as well as supply the required, signed components.
 
