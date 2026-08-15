@@ -15,6 +15,7 @@ object Meta {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 plugins {
@@ -39,12 +40,16 @@ val intTestImplementation by configurations.getting {
     extendsFrom(configurations.implementation.get())
 }
 
-configurations["intTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
+val intTestRuntimeOnly by configurations.getting {
+    extendsFrom(configurations.runtimeOnly.get())
+}
 
 dependencies {
     testImplementation(libs.junit)
+    testRuntimeOnly(libs.junit.launcher)
 
     intTestImplementation(libs.junit)
+    intTestRuntimeOnly(libs.junit.launcher)
     intTestImplementation(libs.bundles.testcontainers.junit)
     intTestImplementation(libs.assertj)
 }
