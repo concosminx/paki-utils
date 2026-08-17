@@ -20,6 +20,9 @@ on:
           - minor
           - patch
 
+permissions:
+  contents: write
+
 jobs:
 
   build:
