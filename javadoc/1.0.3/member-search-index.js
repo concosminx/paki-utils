@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"eu.pakithecat.utils","c":"JavaLibraryTemplate","l":"JavaLibraryTemplate()","u":"%3Cinit%3E()"},{"p":"eu.pakithecat.utils","c":"JavaLibraryTemplate","l":"toFunkyCase(String)","u":"toFunkyCase(java.lang.String)"}];updateSearchResults();
