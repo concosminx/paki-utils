@@ -1,12 +1,28 @@
+plugins {
+    `java-library`
+    signing
+    id("com.vanniktech.maven.publish") version "0.37.0"
+}
+
 group = "eu.pakithecat"
 
+version = providers.gradleProperty("version")
+    .orElse("0.1.0-SNAPSHOT")
+    .get()
+
 object Meta {
-    const val release = "https://s01.oss.sonatype.org/service/local/"
-    const val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-    const val desc = "OSS GitHub Java Library Template Repository"
+    const val description = "OSS GitHub Java Library Template Repository"
+
     const val license = "Apache-2.0"
     const val licenseUrl = "https://opensource.org/licenses/Apache-2.0"
+
     const val githubRepo = "concosminx/paki-utils"
+    const val githubUrl = "https://github.com/$githubRepo"
+    const val issuesUrl = "$githubUrl/issues"
+
+    const val scmConnection = "scm:git:git://github.com/$githubRepo.git"
+    const val scmDeveloperConnection = "scm:git:ssh://git@github.com/$githubRepo.git"
+
     const val developerId = "concosminx"
     const val developerName = "Cosmin C."
     const val developerOrganization = "ACME Corporation"
@@ -16,13 +32,9 @@ object Meta {
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
-}
 
-plugins {
-    // Apply the java-library plugin for API and implementation separation.
-    `java-library`
-    `maven-publish`
-    signing
+    withSourcesJar()
+    withJavadocJar()
 }
 
 repositories {
@@ -54,13 +66,14 @@ dependencies {
     intTestImplementation(libs.assertj)
 }
 
-val intTest = task<Test>("intTest") {
+val intTest = tasks.register<Test>("intTest") {
     description = "Runs integration tests."
     group = "verification"
 
     testClassesDirs = sourceSets["intTest"].output.classesDirs
     classpath = sourceSets["intTest"].runtimeClasspath
-    shouldRunAfter("test")
+
+    shouldRunAfter(tasks.test)
 
     useJUnitPlatform()
 
@@ -69,81 +82,89 @@ val intTest = task<Test>("intTest") {
     }
 }
 
-tasks.check { dependsOn(intTest) }
+tasks.check {
+    dependsOn(intTest)
+}
 
 tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+mavenPublishing {
+    // Maven Central Publisher Portal.
+    publishToMavenCentral(automaticRelease = true)
+
+    // Sign all Maven publications.
+    signAllPublications()
+
+    coordinates(
+        groupId = project.group.toString(),
+        artifactId = project.name,
+        version = project.version.toString(),
+    )
+
+    pom {
+        name.set(project.name)
+        description.set(Meta.description)
+        url.set(Meta.githubUrl)
+
+        licenses {
+            license {
+                name.set(Meta.license)
+                url.set(Meta.licenseUrl)
+            }
+        }
+
+        developers {
+            developer {
+                id.set(Meta.developerId)
+                name.set(Meta.developerName)
+                organization.set(Meta.developerOrganization)
+                organizationUrl.set(Meta.developerOrganizationUrl)
+            }
+        }
+
+        scm {
+            url.set(Meta.githubUrl)
+            connection.set(Meta.scmConnection)
+            developerConnection.set(Meta.scmDeveloperConnection)
+        }
+
+        issueManagement {
+            system.set("GitHub Issues")
+            url.set(Meta.issuesUrl)
+        }
+    }
 }
 
 signing {
     val signingKey = providers.environmentVariable("GPG_SIGNING_KEY")
     val signingPassphrase = providers.environmentVariable("GPG_SIGNING_PASSPHRASE")
-    if (signingKey.isPresent && signingPassphrase.isPresent) {
-        useInMemoryPgpKeys(signingKey.get(), signingPassphrase.get())
-        val extension = extensions.getByName("publishing") as PublishingExtension
-        sign(extension.publications)
-    }
-}
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-            from(components["java"])
-            pom {
-                name.set(project.name)
-                description.set(Meta.desc)
-                url.set("https://github.com/${Meta.githubRepo}")
-                licenses {
-                    license {
-                        name.set(Meta.license)
-                        url.set(Meta.licenseUrl)
-                    }
-                }
-                developers {
-                    developer {
-                        id.set(Meta.developerId)
-                        name.set(Meta.developerName)
-                        organization.set(Meta.developerOrganization)
-                        organizationUrl.set(Meta.developerOrganizationUrl)
-                    }
-                }
-                scm {
-                    url.set("https://github.com/${Meta.githubRepo}.git")
-                    connection.set("scm:git:git://github.com/${Meta.githubRepo}.git")
-                    developerConnection.set("scm:git:git://github.com/${Meta.githubRepo}.git")
-                }
-                issueManagement {
-                    url.set("https://github.com/${Meta.githubRepo}/issues")
-                }
-            }
-        }
+    if (signingKey.isPresent && signingPassphrase.isPresent) {
+        useInMemoryPgpKeys(
+            signingKey.get(),
+            signingPassphrase.get(),
+        )
     }
 }
 
 tasks.jar {
     manifest {
         attributes(
-            mapOf(
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version,
-            ),
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to project.version,
         )
     }
 }
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
-// gradle locking of dependency versions
-//   *required+used for trivy scan
+// Gradle dependency locking.
+// Required/used for Trivy scanning.
 dependencyLocking {
     lockAllConfigurations()
 }
-// always run subproject task with parent
-rootProject.tasks.dependencies { dependsOn(tasks.dependencies) }
+
+// Always run subproject dependency task with parent.
+rootProject.tasks.dependencies {
+    dependsOn(tasks.dependencies)
+}
